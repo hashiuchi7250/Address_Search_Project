@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.address.mapper.AddressMapper">
+	<resultMap id="AddressResult" type="com.example.address.entity.AddressResult">
+		<result column="id" property="id"/>
+		<result column="zipcode" property="zipcode"/>
+		<result column="jiscode" property="jiscode"/>
+		<result column="pref" property="pref"/>
+		<result column="city" property="city"/>
+		<result column="street" property="street"/>
+	</resultMap>
+	<select id="doSearch" resultMap="AddressResult">
+		<if test="keyword != null">
+			SELECT
+				A.id        AS id,
+				A.jiscode   AS jiscode,
+				B.zipcode   AS zipcode,
+				D.pref      AS pref,
+				E.city      AS city,
+				B.street    AS street
+			FROM
+				sampledb.address_jiscode AS A JOIN sampledb.address_zipcode AS B ON A.jiscode = B.jiscode
+				JOIN sampledb.address_kana AS C ON B.jiscode = C.jiscode
+				JOIN sampledb.address_pref AS D ON C.pref_kana = D.pref_kana
+				JOIN sampledb.address_city AS E ON C.city_kana = E.city_kana
+			WHERE B.zipcode LIKE '${keyword}%' OR D.pref LIKE '%${keyword}%' OR E.city LIKE '%${keyword}%' OR B.street LIKE '%${keyword}%';
+		</if>
+		<if test="keyword == null">
+			SELECT
+				A.id        AS id,
+				A.jiscode   AS jiscode,
+				B.zipcode   AS zipcode,
+				D.pref      AS pref,
+				E.city      AS city,
+				B.street    AS street
+			FROM
+				sampledb.address_jiscode AS A JOIN sampledb.address_zipcode AS B ON A.jiscode = B.jiscode
+				JOIN sampledb.address_kana AS C ON B.jiscode = C.jiscode
+				JOIN sampledb.address_pref AS D ON C.pref_kana = D.pref_kana
+				JOIN sampledb.address_city AS E ON C.city_kana = E.city_kana
+			WHERE B.zipcode LIKE '${zipcode}%' ORDER BY B.zipcode;
+		</if>
+	</select>
+	<insert id="insCity">
+	    <!--  insert into sampledb.address_data(zipcode, pref, city, street) values ('${zipcode}', '${pref}', '${city}', '${street}');	-->
+	    insert into sampledb.address_city (city_kana, city) values ('${cityKana}', '${city}');
+	</insert>
+	<insert id="insJiscode">
+	    insert into sampledb.address_jiscode (jiscode) values ('${jiscode}');
+	</insert>
+	<insert id="insKana">
+	    insert into sampledb.address_kana (jiscode, pref_kana, city_kana) values ('${jiscode}', '${prefKana}', '${cityKana}');
+	</insert>
+	<insert id="insPref">
+	    insert into sampledb.address_pref (pref_kana, pref) values ('${prefKana}', '${pref}');
+	</insert>
+	<insert id="insZipcode">
+	    insert into sampledb.address_zipcode (jiscode, zipcode, street_kana, street) values ('${jiscode}', '${zipcode}', '${streetKana}', '${street}');
+	</insert>
+	<update id="exeUpDate">
+		UPDATE
+	        sampledb.address_jiscode AS A
+	            JOIN sampledb.address_zipcode AS B
+	                ON A.jiscode = B.jiscode
+	            JOIN sampledb.address_kana AS C
+	                ON B.jiscode = C.jiscode
+	            JOIN sampledb.address_pref AS D
+	                ON C.pref_kana = D.pref_kana
+	            JOIN sampledb.address_city AS E
+	                ON C.city_kana = E.city_kana
+	    SET
+	        B.zipcode = '${zipcode}'
+	        ,D.pref = '${pref}'
+	        ,E.city = '${city}'
+	        ,B.street = '${street}'
+	    WHERE
+	        A.id = ${id};
+	</update>
+	<delete id="exeDelete">
+    	DELETE A, B, C, D, E FROM
+				sampledb.address_jiscode AS A JOIN sampledb.address_zipcode AS B ON A.jiscode = B.jiscode
+				JOIN sampledb.address_kana AS C ON B.jiscode = C.jiscode
+				JOIN sampledb.address_pref AS D ON C.pref_kana = D.pref_kana
+				JOIN sampledb.address_city AS E ON C.city_kana = E.city_kana
+		WHERE A.jiscode = '${jiscode}';
+	</delete>
+</mapper>

@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sampledb
+    username: root
+    password: root
+    sqlScriptEncoding: UTF-8
+#pooling setting
+spring.datasource.tomcat:
+    maxActive: 15
+    maxIdle: 10
+    minIdle: 5
+    initialSize: 2

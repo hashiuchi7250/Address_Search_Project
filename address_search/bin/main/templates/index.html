@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>住所検索画面</title>
+	<!-- データテーブル読み込み -->
+	<link rel="stylesheet" href="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.css"/>
+    <script src="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.js"></script>
+	<!-- バリデーション読み込み -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/validationEngine.jquery.min.css" type="text/css"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-ja.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/jquery.validationEngine.min.js" type="text/javascript" charset="utf-8"></script>
+	<!-- その他読み込み -->
+	<link href="/css/style.css" rel="stylesheet">
+	<script src="/js/address.js" type="text/javascript"></script>
+</head>
+<body>
+	<img src="/img/gif-load.gif" id="image">
+	<br>
+	<br>
+	<div class="container">
+		<h1>住所検索</h1>
+		<hr>
+		<form th:action="@{/address/search/keyword}" method="get">
+			<div class="form-group">
+				<strong>《県名・市区町村名を入力》</strong><span style="color: red;" th:text="${msg}"></span>
+				<div>
+					<input type="text" id="keyword" name="keyword" th:value="${keyword}">
+					<input type="submit" id="search" value="検索"> <input
+						type="text" id="selectAddredd" value="選択された住所："
+						style="width: 500px;"> <span id="Insertion"></span>
+					<button type="button" data-toggle="modal" data-target="#myModal">新規追加</button>
+					<button th:if="${findResultAddress}" id="csv">CSV出力</button>
+					<br>
+					<a href="/address/search/top">⇨郵便番号検索へ戻る</a>
+				</div>
+			</div>
+		</form>
+		<br> <br>
+		<table id="foo-table" class="table table-hover" style="height: 280px; table-layout:fixed;">
+			<thead>
+				<tr>
+					<th><span style="color: red;" th:if="${findResultAddress}"
+						th:text="${findResultAddress.size() + '件該当'}"></span></th>
+					<th>郵便番号</th>
+					<th></th>
+					<th>都道府県</th>
+					<th>住所１</th>
+					<th>住所２</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="result, satate : ${findResultAddress}" class="selection"
+					th:id="'page-' + ${satate.count}">
+					<td></td>
+					<td id="zipcode" th:text="${result.zipcode}"></td>
+					<td id="invisibleFrame"  th:text="${result.zipcode}"></td>
+					<td id="pref" th:text="${result.pref}"></td>
+					<td id="city" th:text="${result.city}"></td>
+					<td id="street" th:text="${result.street}"></td>
+					<input type="hidden" th:value="${result.id}" id="id">
+					<input type="hidden" th:value="${result.jiscode}" id="jiscode">
+				</tr>
+			</tbody>
+		</table>
+		<!-- 新規追加モーダルウィンドウの中身 -->
+		<div class="modal fade" id="myModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">新規追加</h4>
+					</div>
+					<div class="modal-body">
+						<form id="insForm">
+							<p>
+								郵便番号：<input type="text" name="insZipcode" id="insZipcode" class="validate[required][custom[onlyNumberSp]] text-input">
+							</p>
+							<p>
+								都道府県：<input type="text" name="insPref" id="insPref" class="validate[required] text-input">
+							</p>
+							<p>
+								住所１： <input type="text" name="insCity" id="insCity" class="validate[required] text-input">
+							</p>
+							<p>
+								住所２： <input type="text" name="insStreet" id="insStreet" class="validate[required] text-input">
+							</p>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<input type="submit" name="insert" value="登録" id="insert" disabled="disabled">
+						<button type="button" data-dismiss="modal">閉じる</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 編集モーダルウィンドウの中身 -->
+		<div class="modal fade" id="editModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">編集</h4>
+					</div>
+					<div class="modal-body">
+						<form id="editForm">
+							<p>
+								郵便番号：<input type="text" name="selectZipcode" id="selectZipcode" class="validate[required][custom[onlyNumberSp]] text-input">
+							</p>
+							<p>
+								都道府県：<input type="text" name="selectPref" id="selectPref" class="validate[required] text-input">
+							</p>
+							<p>
+								住所１： <input type="text" name="selectCity" id="selectCity" class="validate[required] text-input">
+							</p>
+							<p>
+								住所２： <input type="text" name="selectStreet" id="selectStreet" class="validate[required] text-input">
+							</p>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<input type="submit" name="update" value="更新" id="update" disabled="disabled">
+						<input type="submit" name="del" value="削除" id="del">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

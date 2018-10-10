@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+#image {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+	max-width: 100%;
+	max-height: 100%;
+	display: none;
+}
+#invisibleFrame{
+	opacity:0;
+}
+
+#foo-table2{
+	margin: 0 auto;
+	padding: 10px 20px ;
+}
+
+/* ここまでデモページ用のコード */
+
+#modal-content {
+	width: 50% ;
+	margin: 0 ;
+	padding: 10px 20px ;
+	border: 2px solid #aaa ;
+	background: #fff ;
+	position: fixed ;
+	display: none ;
+	z-index: 2 ;
+}
